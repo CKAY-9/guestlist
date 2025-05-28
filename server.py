@@ -30,7 +30,7 @@ def new_message():
         return "Invalid message", 400
     
     data: dict = request.json
-    if not data.get("message") or len(data.get("message")) < 5:
+    if not data.get("message") or len(data.get("message")) < 5 or len(data.get("message")) >= 255 or len(data.get("name")) >= 50:
         return "Invalid message", 400
     
     message = profanity.censor(data.get("message"))
