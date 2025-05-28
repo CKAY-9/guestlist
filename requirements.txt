@@ -1,0 +1,4 @@
+Flask
+flask-limiter
+flask-cors
+better-profanity
