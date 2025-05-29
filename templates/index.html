@@ -97,7 +97,7 @@
 		<script>
 			const id_input = document.getElementById("message_id_input");
 			const result_element = document.getElementById("result");
-			const api = "http://localhost:5000";
+			const api = "https://guestlist.ckay9.ca";
 
 			const search = async () => {
 				const response = await fetch(`${api}/message/${id_input.value}`, {
