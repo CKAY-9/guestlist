@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -24,7 +24,7 @@ CORS(app=app)
 limiter = Limiter(get_remote_address, app=app)
 
 @app.post("/message")
-@limiter.limit("3/hour")
+@limiter.limit("3/day")
 def new_message():
     if not request.is_json:
         return "Invalid message", 400
@@ -44,24 +44,22 @@ def new_message():
     return "Created message", 200
 
 @app.get("/message")
+@limiter.limit("15/minute")
 def get_messages():
-    return messages
+    start = request.args.get("start", default=0, type=int)
+    reversed_messages = messages[::-1]
+    sliced_messages = reversed_messages[start:start + 25]
+    return sliced_messages
+
+@app.get("/message/<int:message_id>")
+@limiter.limit("15/minute")
+def get_message_from_id(message_id: int):
+    for entry in messages:
+        if entry["id"] == message_id:
+            return entry
+        
+    return "Invalid ID", 404
 
 @app.get("/")
 def home_page():
-    return """
-        <head>
-            <link rel="preconnect" href="https://fonts.googleapis.com">
-            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-            <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-        </head>
-        <body 
-            style="background: rgb(10, 10, 18); margin: 0; padding: 0;"
-        >
-            <div style="color: white; display: grid; place-content: center; width: 100vw; height: 100vh">
-                <h1 style="font-family: 'Inter', sans-serif;">
-                    Guest List Message API. <a style="color: white" href="https://github.com/CKAY-9/guestlist">GitHub</a>
-                </h1>
-            </div>
-        </body>
-    """, 200
+    return render_template("index.html"), 200
